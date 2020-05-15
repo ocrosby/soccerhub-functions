@@ -4,113 +4,113 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
 
 trigger:
-- master
+    - master
 
-variables:
+    variables:
 
-  # Azure Resource Manager connection created during pipeline creation
-  azureSubscription: '001ecbd0-c4b5-48b1-a904-2ea0c69dbb1f'
+      # Azure Resource Manager connection created during pipeline creation
+      azureSubscription: '001ecbd0-c4b5-48b1-a904-2ea0c69dbb1f'
 
-  # Function app name
-  functionAppName: 'soccerhub-functions'
+      # Function app name
+      functionAppName: 'soccerhub-functions'
 
-  # Agent VM image name
-  vmImageName: 'ubuntu-latest'
+      # Agent VM image name
+      vmImageName: 'ubuntu-latest'
 
-stages:
-- stage: Build
-  displayName: Build stage
-  jobs:
-  - job: Build
-    displayName: Build
-    pool:
-      vmImage: $(vmImageName)
+    stages:
+    - stage: Build
+      displayName: Build stage
+      jobs:
+      - job: Build
+        displayName: Build
+        pool:
+          vmImage: $(vmImageName)
 
-    steps:
-    - task: NodeTool@0
-      inputs:
-        versionSpec: '12.x'
-      displayName: 'Install Node.js'
+        steps:
+        - task: NodeTool@0
+          inputs:
+            versionSpec: '12.x'
+          displayName: 'Install Node.js'
 
-    - task: Npm@1
-      inputs:
-        command: 'install'
-      displayName: 'Install Dependencies'
+        - task: Npm@1
+          inputs:
+            command: 'install'
+          displayName: 'Install Dependencies'
 
-    - task: Npm@1
-      inputs:
-        command: 'custom'
-        customCommand: 'run lint'
-      displayName: 'Analyze Syntax'
+        - task: Npm@1
+          inputs:
+            command: 'custom'
+            customCommand: 'run lint'
+          displayName: 'Analyze Syntax'
 
-    - task: Npm@1
-      inputs:
-        command: 'custom'
-        customCommand: 'run coverage:enforce'
-      displayName: 'Run Unit Tests'
+        - task: Npm@1
+          inputs:
+            command: 'custom'
+            customCommand: 'run coverage:enforce'
+          displayName: 'Run Unit Tests'
 
-    - task: Npm@1
-      inputs:
-        command: 'custom'
-        customCommand: 'prune --production'
-      displayName: 'Prune Development Dependencies'
+        - task: Npm@1
+          inputs:
+            command: 'custom'
+            customCommand: 'prune --production'
+          displayName: 'Prune Development Dependencies'
 
-    - task: PublishTestResults@2
-      displayName: 'Publish unit test results'
-      inputs:
-        testResultsFiles: junit.xml
-        searchFolder: '$(System.DefaultWorkingDirectory)/.testresults/unit'
-        testRunTitle: 'soccerhub-functions::Unit Tests::$(Build.BuildId)'
+        - task: PublishTestResults@2
+          displayName: 'Publish unit test results'
+          inputs:
+            testResultsFiles: junit.xml
+            searchFolder: '$(System.DefaultWorkingDirectory)/.testresults/unit'
+            testRunTitle: 'soccerhub-functions::Unit Tests::$(Build.BuildId)'
 
-    - task: PublishCodeCoverageResults@1
-      displayName: 'Publish code coverage'
-      inputs:
-        codeCoverageTool: Cobertura
-        summaryFileLocation: '$(Build.SourcesDirectory)/.coverage/unit/cobertura-coverage.xml'
-        reportDirectory: '$(Build.SourcesDirectory)/.coverage/unit'
-        failIfCoverageEmpty: true
+        - task: PublishCodeCoverageResults@1
+          displayName: 'Publish code coverage'
+          inputs:
+            codeCoverageTool: Cobertura
+            summaryFileLocation: '$(Build.SourcesDirectory)/.coverage/unit/cobertura-coverage.xml'
+            reportDirectory: '$(Build.SourcesDirectory)/.coverage/unit'
+            failIfCoverageEmpty: true
 
-    - script: |
-        dotnet build extensions.csproj --runtime ubuntu.16.04-x64 --output ./bin/
-      displayName: 'Build extensions and prepare binaries'
+        - script: |
+            dotnet build extensions.csproj --runtime ubuntu.16.04-x64 --output ./bin/
+          displayName: 'Build extensions and prepare binaries'
 
-    - task: ArchiveFiles@2
-      displayName: 'Archive files'
-      inputs:
-        rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
-        includeRootFolder: false
-        archiveType: zip
-        archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
-        replaceExistingArchive: true
+        - task: ArchiveFiles@2
+          displayName: 'Archive files'
+          inputs:
+            rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
+            includeRootFolder: false
+            archiveType: zip
+            archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
+            replaceExistingArchive: true
 
-    - task: PublishPipelineArtifact@0
-      displayName: 'Publish pipeline artifacts'
-      inputs:
-        targetPath: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
+        - task: PublishPipelineArtifact@0
+          displayName: 'Publish pipeline artifacts'
+          inputs:
+            targetPath: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
 
-- stage: Deploy
-  displayName: Deploy stage
-  dependsOn: Build
-  condition: succeeded()
-  jobs:
-  - deployment: Deploy
-    displayName: Deploy
-    environment: 'development'
-    pool:
-      vmImage: $(vmImageName)
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - task: DownloadPipelineArtifact@1
-            displayName: 'Download Pipeline Artifact'
-            inputs:
-              buildType: current
+    - stage: Deploy
+      displayName: Deploy stage
+      dependsOn: Build
+      condition: succeeded()
+      jobs:
+      - deployment: Deploy
+        displayName: Deploy
+        environment: 'development'
+        pool:
+          vmImage: $(vmImageName)
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+              - task: DownloadPipelineArtifact@1
+                displayName: 'Download Pipeline Artifact'
+                inputs:
+                  buildType: current
 
-          - task: AzureFunctionApp@1
-            displayName: 'Azure Functions App Deploy: SoccerHub Functions'
-            inputs:
-              azureSubscription: '$(azureSubscription)'
-              appType: functionAppLinux
-              appName: $(functionAppName)
-              package: '$(System.ArtifactsDirectory)/drop/$(Build.BuildId).zip'
+              - task: AzureFunctionApp@1
+                displayName: 'Azure Functions App Deploy: SoccerHub Functions'
+                inputs:
+                  azureSubscription: '$(azureSubscription)'
+                  appType: functionAppLinux
+                  appName: $(functionAppName)
+                  package: '$(System.ArtifactsDirectory)/drop/$(Build.BuildId).zip'
