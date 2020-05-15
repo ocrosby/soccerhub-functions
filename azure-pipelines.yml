@@ -29,14 +29,49 @@ stages:
     steps:
     - task: NodeTool@0
       inputs:
-        versionSpec: '10.x'
+        versionSpec: '12.x'
       displayName: 'Install Node.js'
+
+    - task: Npm@1
+      inputs:
+        command: 'install'
+      displayName: 'Install Dependencies'
+
+    - task: Npm@1
+      inputs:
+        command: 'custom'
+        customCommand: 'run lint'
+      displayName: 'Analyze Syntax'
+
+    - task: Npm@1
+      inputs:
+        command: 'custom'
+        customCommand: 'run coverage:enforce'
+      displayName: 'Run Unit Tests'
+
+    - task: Npm@1
+      inputs:
+        command: 'custom'
+        customCommand: 'prune --production'
+      displayName: 'Prune Development Dependencies'
+
+    - task: PublishTestResults@2
+      displayName: 'Publish unit test results'
+      inputs:
+        testResultsFiles: junit.xml
+        searchFolder: '$(System.DefaultWorkingDirectory)/.testresults/unit'
+        testRunTitle: 'soccerhub-functions::Unit Tests::$(Build.BuildId)'
+
+    - task: PublishCodeCoverageResults@1
+      displayName: 'Publish code coverage'
+      inputs:
+        codeCoverageTool: Cobertura
+        summaryFileLocation: '$(Build.SourcesDirectory)/.coverage/unit/cobertura-coverage.xml'
+        reportDirectory: '$(Build.SourcesDirectory)/.coverage/unit'
+        failIfCoverageEmpty: true
 
     - script: |
         dotnet build extensions.csproj --runtime ubuntu.16.04-x64 --output ./bin/
-        npm install
-        npm run build --if-present
-        npm run test --if-present
       displayName: 'Build extensions and prepare binaries'
 
     - task: ArchiveFiles@2
