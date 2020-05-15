@@ -1,3 +1,7 @@
+.coverage/
+.testresults/
+test-report.xml
+
 
 # Logs
 logs

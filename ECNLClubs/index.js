@@ -1,8 +1,10 @@
+'use strict';
+
 const axios = require('axios');
 
 const memberClubsURL = 'https://api.totalglobalsports.com/json/?token=Q0jcEIroy7Y=|9&ds=GetOrgClublistBySeasonIDPagingSP&oid=9&orgsid=12';
 
-module.exports = async function (context, req) {
+module.exports = async function (context) {
     context.log('JavaScript HTTP trigger function processed a request.');
 
     console.log('Retrieving clubs ...');
@@ -16,7 +18,7 @@ module.exports = async function (context, req) {
                 count: response.data.length,
                 data: response.data
             }
-        }
+        };
     } else {
         context.res = {
             status: 500,

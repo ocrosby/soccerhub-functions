@@ -1,3 +1,5 @@
+'use strict';
+
 function propertyExistsInQuery(req, propertyName) {
     if (!req) {
         return false;
@@ -7,7 +9,7 @@ function propertyExistsInQuery(req, propertyName) {
         return false;
     }
 
-    return req.query.hasOwnProperty(propertyName);
+    return Object.prototype.hasOwnProperty.call(req.query, propertyName);
 }
 
 function propertyExistsInBody(req, propertyName) {
@@ -19,7 +21,7 @@ function propertyExistsInBody(req, propertyName) {
         return false;
     }
 
-    return req.body.hasOwnProperty(propertyName);
+    return Object.prototype.hasOwnProperty.call(req.body, propertyName);
 }
 
 function getPropertyFromQuery(req, propertyName) {
@@ -48,4 +50,25 @@ function getProperty(req, propertyName) {
     }
 }
 
+function generateECNLUrl(options) {
+    let url = 'https://api.totalglobalsports.com/json/?token=Q0jcEIroy7Y=|9';
+
+    if (!options) {
+        return url;
+    }
+
+    const keys = Object.keys(options);
+
+    keys.sort();
+
+    keys.forEach(key => url += `&${key}=${options[key]}`);
+
+    return url;
+}
+
+module.exports.generateECNLUrl = generateECNLUrl;
+module.exports.propertyExistsInBody = propertyExistsInBody;
+module.exports.propertyExistsInQuery = propertyExistsInQuery;
+module.exports.getPropertyFromBody = getPropertyFromBody;
+module.exports.getPropertyFromQuery = getPropertyFromQuery;
 module.exports.getProperty = getProperty;

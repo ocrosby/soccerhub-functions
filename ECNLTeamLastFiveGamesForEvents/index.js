@@ -1,16 +1,38 @@
+'use strict';
+
+const axios = require('axios');
+
+const utils = require('../SharedCode/utils');
+
 module.exports = async function (context, req) {
     context.log('JavaScript HTTP trigger function processed a request.');
 
-    if (req.query.name || (req.body && req.body.name)) {
-        context.res = {
-            // status: 200, /* Defaults to 200 */
-            body: "Hello " + (req.query.name || req.body.name)
-        };
-    }
-    else {
+    const teamId = utils.getProperty(req, 'tid');
+
+    context.log(`Requesting details for team ${teamId} ...`);
+
+    if (teamId) {
+        let response = await axios.get(utils.generateECNLUrl({
+            ds: 'TeamLastFiveGamesForEvents',
+            tid: teamId
+        }));
+
+        if (response.status === 200) {
+            context.log(`Successfully retrieved data for the last file games for team "${teamId}"`);
+
+            context.res = {
+                body: response.data
+            };
+        } else {
+            context.res = {
+                status: 500,
+                body: `The response status code was ${response.status}!`
+            };
+        }
+    } else {
         context.res = {
             status: 400,
-            body: "Please pass a name on the query string or in the request body"
+            body: 'Please pass a team identifier (tid) on the query string or in the request body.'
         };
     }
 };

@@ -1,3 +1,5 @@
+'use strict';
+
 const axios = require('axios');
 
 const utils = require('../SharedCode/utils');
@@ -27,7 +29,7 @@ module.exports = async function (context, req) {
     } else {
         context.res = {
             status: 400,
-            body: "Please pass a team identifier (tid) on the query string or in the request body."
+            body: 'Please pass a team identifier (tid) on the query string or in the request body.'
         };
     }
 };

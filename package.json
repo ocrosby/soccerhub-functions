@@ -1,14 +1,35 @@
 {
-  "name": "soccerhub-functions",
-  "version": "1.0.0",
-  "description": "",
-  "scripts": {
-    "test": "echo \"No tests yet...\""
-  },
-  "dependencies": {
-    "axios": "^0.18.0",
-    "cheerio": "^1.0.0-rc.3",
-    "cheerio-tableparser": "^1.0.1"
-  },
-  "devDependencies": {}
+    "name": "soccerhub-functions",
+    "version": "1.0.0",
+    "description": "A project containing serveless functions for SoccerHub.",
+    "scripts": {
+        "build": "npm run lint && npm run coverage:enforce",
+        "clean": "rimraf .testresults .coverage",
+        "lint": "eslint SharedCode/**/*.js ECNL*/**/*.js test/**/*.js",
+        "test": "jest",
+        "test:ci": "jest --coverage --maxWorkers=2",
+        "pretest": "rimraf .testresults/unit .coverage/unit",
+        "coverage": "npm test -- --coverage --coverageThreshold={}",
+        "coverage:enforce": "npm test -- --coverage",
+        "coverage:open": "npm run coverage && open-cli .coverage/unit/index.html"
+    },
+    "dependencies": {
+        "axios": "^0.18.1",
+        "cheerio": "^1.0.0-rc.3",
+        "cheerio-tableparser": "^1.0.1"
+    },
+    "devDependencies": {
+        "@swellaby/eslint-config": "^2.0.0",
+        "chai": "^4.2.0",
+        "chai-as-promised": "^7.1.1",
+        "eslint": "^7.0.0",
+        "husky": "^4.2.5",
+        "jest": "^26.0.1",
+        "jest-junit": "^10.0.0",
+        "jest-sonar-reporter": "^2.0.0",
+        "nyc": "^15.0.1",
+        "open-cli": "^6.0.1",
+        "rimraf": "^3.0.2",
+        "sinon": "^9.0.2"
+    }
 }

@@ -1,6 +1,8 @@
+'use strict';
+
 const axios = require('axios');
 
-module.exports = async function (context, req) {
+module.exports = async function (context) {
     context.log('JavaScript HTTP trigger function processed a request.');
 
     let response = await axios.get('https://api.totalglobalsports.com/json/?token=Q0jcEIroy7Y=|9&ds=OrgClubList&oid=9&osid=16');
