@@ -18,7 +18,7 @@ module.exports = async function (context, req) {
         }));
 
         if (response.status === 200) {
-            context.log(`Successfully retrieved data for the last file games for team "${tid}"`);
+            context.log(`Successfully retrieved events for team "${tid}"`);
 
             context.res = {
                 body: response.data

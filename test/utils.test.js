@@ -10,7 +10,7 @@ chai.should();
 
 const expect = chai.expect;
 
-const utils = require('../../SharedCode/utils');
+const utils = require('../SharedCode/utils');
 
 describe('utils', () => {
     describe('propertyExistsInQuery', () => {

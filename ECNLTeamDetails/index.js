@@ -7,12 +7,15 @@ const utils = require('../SharedCode/utils');
 module.exports = async function (context, req) {
     context.log('JavaScript HTTP trigger function processed a request.');
 
-    const teamId = utils.getProperty(req, 'tid');
+    const tid = utils.getProperty(req, 'tid');
 
-    context.log(`Requesting details for team ${teamId} ...`);
+    context.log(`Requesting details for team ${tid} ...`);
 
-    if (teamId) {
-        let response = await axios.get(`https://api.totalglobalsports.com/json/?token=Q0jcEIroy7Y=|9&ds=OrgTeamDetails&oid=9&osid=16&tid=${teamId}`);
+    if (tid) {
+        let response = await axios.get(utils.generateECNLUrl({
+            ds: 'OrgTeamDetails',
+            tid: tid
+        }));
 
         if (response.status === 200) {
             context.log(`Successfully retrieved details for "${response.data[0].Name}".`);

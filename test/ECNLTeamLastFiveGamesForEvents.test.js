@@ -12,8 +12,8 @@ chai.should();
 
 const expect = chai.expect;
 
-const httpFunction = require('../../ECNLTeamLastFiveGamesForEvents/index');
-const context = require('../defaultContext');
+const httpFunction = require('../ECNLTeamLastFiveGamesForEvents/index');
+const context = require('./defaultContext');
 
 describe('ECNLTeamLastFiveGamesForEvents', () => {
     let sandbox;
