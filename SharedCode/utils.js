@@ -50,23 +50,6 @@ function getProperty(req, propertyName) {
     }
 }
 
-function generateECNLUrl(options) {
-    let url = 'https://api.totalglobalsports.com/json/?token=Q0jcEIroy7Y=|9';
-
-    if (!options) {
-        return url;
-    }
-
-    const keys = Object.keys(options);
-
-    keys.sort();
-
-    keys.forEach(key => url += `&${key}=${options[key]}`);
-
-    return url;
-}
-
-module.exports.generateECNLUrl = generateECNLUrl;
 module.exports.propertyExistsInBody = propertyExistsInBody;
 module.exports.propertyExistsInQuery = propertyExistsInQuery;
 module.exports.getPropertyFromBody = getPropertyFromBody;
